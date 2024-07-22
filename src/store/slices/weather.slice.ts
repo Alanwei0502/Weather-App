@@ -127,10 +127,9 @@ export const weatherSlice: Slice<IWeatherAppState> = createSlice({
       })
       .addCase(getCurrentWeather.fulfilled, (state, action) => {
         const currentWeather = action.payload;
-        const cityTime =
-          new Date(
-            (currentWeather.dt + currentWeather.timezone) * 1000
-          ).getUTCHours() + 1;
+        const cityTime = new Date(
+          (currentWeather.dt + currentWeather.timezone) * 1000
+        ).getUTCHours();
         state.backgroundColor =
           cityTime >= 6 && cityTime < 18 ? 'day' : 'night';
         state.currentWeather = currentWeather;

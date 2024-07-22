@@ -27,8 +27,6 @@ function App() {
         if (result.state === 'granted') {
           navigator.geolocation.getCurrentPosition(setUserLocalWeather);
         } else if (result.state === 'prompt' || result.state === 'denied') {
-          console.log('set');
-
           setPrompt('Please allow location access to get the weather information.');
         }
       });
@@ -36,7 +34,6 @@ function App() {
       navigator.geolocation.getCurrentPosition(setUserLocalWeather);
     }
   }, [dispatch]);
-
 
   return (
     <div className='mx-auto max-w-screen-md'>
