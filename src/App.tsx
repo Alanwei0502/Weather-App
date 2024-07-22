@@ -1,22 +1,24 @@
-import './App.css'
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import OpenWeather from './api/openWeather.api';
-import { setCity } from './store/slices/weather.slice';
+import { setCity, setIsLoading } from './store/slices/weather.slice';
 import Header from './components/Header';
 import WeatherDashboard from './components/WeatherDashboard';
 import CityCardList from './components/CityCardList';
 import Footer from './components/Footer';
+import Spinner from './components/Sipnner';
+import { useAppDispatch } from './hooks';
 
 function App() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   // Get user's location permission and set the weather information
   useEffect(() => {
     const setUserLocalWeather = async (position: GeolocationPosition) => {
+      dispatch(setIsLoading(true));
       const { latitude, longitude } = position.coords;
       const cities = await OpenWeather.getCityInfoByCoords({ lat: latitude, lon: longitude });
-      dispatch(setCity(cities[0]))
+      dispatch(setCity(cities[0]));
+      dispatch(setIsLoading(false));
     };
 
     if (navigator.permissions) {
@@ -41,6 +43,7 @@ function App() {
         <CityCardList />
       </main>
       <Footer />
+      <Spinner />
     </div>
   )
 }

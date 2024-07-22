@@ -2,15 +2,14 @@ import React, { useEffect } from 'react'
 import { DndContext, DragEndEvent, KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import CityCard from './CityCard';
-import { useAppSelector } from '../hooks';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '../hooks';
 import { setFavoriteCities } from '../store/slices/weather.slice';
 
 interface CityCardListProps {
 }
 
 const CityCardList: React.FC<CityCardListProps> = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const isMenuOpen = useAppSelector(state => state.weather.isMenuOpen);
   const favoriteCities = useAppSelector(state => state.weather.favoriteCities);

@@ -1,13 +1,12 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux';
 import Input from './Input';
 import OpenWeather from '../api/openWeather.api';
-import { setBackgroundColor, setCity, toggleMenu } from '../store/slices/weather.slice';
-import { useAppSelector } from '../hooks';
+import { getCurrentWeather, setCity, setIsLoading, toggleMenu } from '../store/slices/weather.slice';
+import { useAppDispatch, useAppSelector } from '../hooks';
 
 
 const Header = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [input, setInput] = useState('');
 
@@ -19,18 +18,19 @@ const Header = () => {
 
   const handleSearch = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
+      dispatch(setIsLoading(true));
       try {
         const cities = await OpenWeather.getCityInfo({ q: e.currentTarget.value });
         const city = cities[0];
         const { lat, lon } = city;
-        const currentWeather = await OpenWeather.getCurrentWeather({ lat, lon });
-        const cityTime = new Date((currentWeather.dt + currentWeather.timezone) * 1000).getUTCHours();
+        dispatch(getCurrentWeather({ lat, lon }));
         dispatch(setCity(city))
-        dispatch(setBackgroundColor(cityTime >= 6 && cityTime < 18 ? 'day' : 'night'));
         dispatch(toggleMenu({}));
         setInput('');
       } catch (error) {
         console.error(error);
+      } finally {
+        dispatch(setIsLoading(false));
       }
     }
   }

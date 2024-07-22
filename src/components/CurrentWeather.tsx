@@ -1,11 +1,9 @@
 import React, { useEffect } from 'react'
 import { weatherIcon } from '../utils';
 import { useAppDispatch, useAppSelector } from '../hooks';
-import { setBackgroundColor, setCurrentWeather } from '../store/slices/weather.slice';
-import OpenWeather from '../api/openWeather.api';
+import { getCurrentWeather } from '../store/slices/weather.slice';
 
-interface CurrentWeatherProps {
-}
+interface CurrentWeatherProps { }
 
 const CurrentWeather: React.FC<CurrentWeatherProps> = () => {
   const dispatch = useAppDispatch();
@@ -16,12 +14,7 @@ const CurrentWeather: React.FC<CurrentWeatherProps> = () => {
 
   useEffect(() => {
     if (!lat || !lon) return;
-    (async () => {
-      const currentWeather = await OpenWeather.getCurrentWeather({ lat, lon });
-      const cityTime = new Date((currentWeather.dt + currentWeather.timezone) * 1000).getUTCHours() + 1;
-      dispatch(setCurrentWeather(currentWeather));
-      dispatch(setBackgroundColor(cityTime >= 6 && cityTime < 18 ? 'day' : 'night'))
-    })()
+    dispatch(getCurrentWeather({ lat, lon }));
   }, [lat, lon, dispatch]);
 
   if (!currentWeather || !city) return null;

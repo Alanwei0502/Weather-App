@@ -10,6 +10,7 @@ export interface IWeatherAppState {
   backgroundColor: 'day' | 'night';
   favoriteCities: LocalStorageMyCity[];
   isMenuOpen: boolean;
+  isLoading: boolean;
 }
 
 export const sliceName = 'weather';
@@ -21,6 +22,7 @@ const initialState: IWeatherAppState = {
   backgroundColor: 'day',
   favoriteCities: JSON.parse(localStorage?.getItem('my_cities') ?? '[]'),
   isMenuOpen: false,
+  isLoading: false,
 };
 
 export const getForecast = createAppAsyncThunk(
@@ -35,18 +37,24 @@ export const getForecast = createAppAsyncThunk(
   }
 );
 
+export const getCurrentWeather = createAppAsyncThunk(
+  `${sliceName}/getCurrentWeather`,
+  async ({ lat, lon }: { lat: number; lon: number }, thunkApi) => {
+    try {
+      const currentWeather = await OpenWeather.getCurrentWeather({ lat, lon });
+      return currentWeather;
+    } catch (error) {
+      return thunkApi.rejectWithValue(error);
+    }
+  }
+);
+
 export const weatherSlice: Slice<IWeatherAppState> = createSlice({
   name: sliceName,
   initialState,
   reducers: {
     setCity: (state, action: PayloadAction<GetCityInfoResponse[0]>) => {
       state.city = action.payload;
-    },
-    setCurrentWeather: (
-      state,
-      action: PayloadAction<GetCurrentWeatherResponse>
-    ) => {
-      state.currentWeather = action.payload;
     },
     setForecast: (state, action: PayloadAction<GetForecastResponse>) => {
       state.forecast = action.payload;
@@ -93,17 +101,43 @@ export const weatherSlice: Slice<IWeatherAppState> = createSlice({
       localStorage.setItem('my_cities', JSON.stringify(newFavoriteCities));
       state.favoriteCities = newFavoriteCities;
     },
+    setIsLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
+    },
     toggleMenu: (state) => {
       state.isMenuOpen = !state.isMenuOpen;
     },
   },
   extraReducers: (builder) => {
     builder
+      .addCase(getForecast.pending, (state) => {
+        state.isLoading = true;
+      })
       .addCase(getForecast.fulfilled, (state, action) => {
         state.forecast = action.payload;
+        state.isLoading = false;
       })
       .addCase(getForecast.rejected, (state, action) => {
         state.forecast = initialState.forecast;
+        state.isLoading = false;
+        console.error(action.error);
+      })
+      .addCase(getCurrentWeather.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getCurrentWeather.fulfilled, (state, action) => {
+        const currentWeather = action.payload;
+        const cityTime =
+          new Date(
+            (currentWeather.dt + currentWeather.timezone) * 1000
+          ).getUTCHours() + 1;
+        state.backgroundColor =
+          cityTime >= 6 && cityTime < 18 ? 'day' : 'night';
+        state.currentWeather = currentWeather;
+        state.isLoading = false;
+      })
+      .addCase(getCurrentWeather.rejected, (state, action) => {
+        state.isLoading = false;
         console.error(action.error);
       });
   },
@@ -111,9 +145,9 @@ export const weatherSlice: Slice<IWeatherAppState> = createSlice({
 
 export const {
   setCity,
-  setCurrentWeather,
   setForecast,
   setBackgroundColor,
   setFavoriteCities,
+  setIsLoading,
   toggleMenu,
 } = weatherSlice.actions;
