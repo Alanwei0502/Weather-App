@@ -53,11 +53,18 @@ const CityCardList: React.FC<CityCardListProps> = () => {
     <>
       <div aria-label="menu-bg" className={`absolute inset-0 bg-black ${isMenuOpen ? 'block' : 'hidden'}`} />
       <section className={`relative duration-100 ease-in-out ${isMenuOpen ? 'block' : 'hidden'}`}>
-        <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-          <SortableContext items={favoriteCities}>
-            {favoriteCities.map(city => <CityCard city={city} key={city.id} />)}
-          </SortableContext>
-        </DndContext>
+        {favoriteCities.length > 0
+          ? (
+            <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+              <SortableContext items={favoriteCities}>
+                {favoriteCities.map(city => <CityCard city={city} key={city.id} />)}
+              </SortableContext>
+            </DndContext>
+          )
+          : (
+            <p className='text-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>Please search a city and add to the list.</p>
+          )
+        }
       </section>
     </>
 
