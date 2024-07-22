@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
   const isMenuOpen = useAppSelector(state => state.weather.isMenuOpen);
   const favoriteCities = useAppSelector(state => state.weather.favoriteCities);
 
-  const isAddDisabled = favoriteCities.filter(i => i.name === city?.name).length > 0 || isMenuOpen;
+  const isAddDisabled = !city || favoriteCities.filter(i => i.name === city?.name).length > 0 || isMenuOpen;
   const isDeleteDisabled = favoriteCities.filter(i => i.name === city?.name).length === 0 || isMenuOpen;
 
   const handleClickAdd = () => {
