@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import OpenWeather from './api/openWeather.api';
 import { setCity, setIsLoading } from './store/slices/weather.slice';
 import Header from './components/Header';
@@ -10,6 +10,7 @@ import { useAppDispatch } from './hooks';
 
 function App() {
   const dispatch = useAppDispatch();
+  const [prompt, setPrompt] = useState('');
 
   // Get user's location permission and set the weather information
   useEffect(() => {
@@ -26,7 +27,9 @@ function App() {
         if (result.state === 'granted') {
           navigator.geolocation.getCurrentPosition(setUserLocalWeather);
         } else if (result.state === 'prompt' || result.state === 'denied') {
-          alert('Please allow location access to get the weather information.');
+          console.log('set');
+
+          setPrompt('Please allow location access to get the weather information.');
         }
       });
     } else {
@@ -38,6 +41,7 @@ function App() {
   return (
     <div className='mx-auto max-w-screen-md'>
       <Header />
+      {prompt && <p className='fixed z-10 text-center top-1/2 -translate-y-1/2'>{prompt}</p>}
       <main className='text-shadow-sm px-2 pb-20 mx-auto max-w-screen-md min-h-screen relative select-none overflow-y-scroll'>
         <WeatherDashboard />
         <CityCardList />
