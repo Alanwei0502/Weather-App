@@ -39,8 +39,6 @@ const Forecast: React.FC<ForecastProps> = () => {
       return acc;
     }, {} as { [key: PropertyKey]: GetForecastResponse['list'] }) ?? {});
 
-  console.log(groupByDayList);
-
   return (
     <section aria-label="5 day forecast" className='bg-blend-lighten p-3 rounded-2xl bg-gray-100 bg-opacity-10 backdrop-filter backdrop-blur-sm shadow-md'>
       <p aria-label='4 days forecast' className='font-medium pb-2 border-b-1'>Next 5-Day Forecast</p>
