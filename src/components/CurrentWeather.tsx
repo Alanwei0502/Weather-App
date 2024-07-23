@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { weatherIcon } from '../utils';
+import { getIconSrc, isDayOrNight } from '../utils';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { getCurrentWeather } from '../store/slices/weather.slice';
 
@@ -18,9 +18,9 @@ const CurrentWeather: React.FC<CurrentWeatherProps> = () => {
   }, [lat, lon, dispatch]);
 
   if (!currentWeather || !city) return null;
-  const cityTime = new Date((currentWeather.dt + currentWeather.timezone) * 1000).getUTCHours();
-  const iconNum = currentWeather.weather[0].icon.substring(0, 2);
-  const iconSrc = weatherIcon[`${iconNum}${cityTime >= 6 && cityTime < 18 ? 'd' : 'n'}` as WeatherCondition['icon']];
+
+  const dayOrNight = isDayOrNight(currentWeather.sys.sunrise, currentWeather.sys.sunset, currentWeather.dt * 1000, currentWeather.timezone)
+  const iconSrc = getIconSrc(currentWeather.weather[0].icon, dayOrNight);
 
   return (
     <section aria-label='city and main information' className='p-4 pt-6 flex flex-col items-center'>

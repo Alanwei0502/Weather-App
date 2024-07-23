@@ -51,8 +51,8 @@ const CityCardList: React.FC<CityCardListProps> = () => {
 
   return (
     <>
-      <div aria-label="menu-bg" className={`absolute inset-0 bg-black ${isMenuOpen ? 'block' : 'hidden'}`} />
-      <section className={`relative duration-100 ease-in-out ${isMenuOpen ? 'block' : 'hidden'}`}>
+      <div aria-label="menu-bg" className={`absolute inset-0 bg-black ${isMenuOpen ? '' : 'hidden'}`} />
+      <section className={`relative duration-100 ease-in-out ${isMenuOpen ? '' : 'hidden'}`}>
         {favoriteCities.length > 0
           ? (
             <DndContext sensors={sensors} onDragEnd={handleDragEnd}>

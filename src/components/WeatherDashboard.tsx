@@ -37,12 +37,20 @@ const WeatherDashboard = () => {
       />
       <div aria-label="night-bg" className={`absolute inset-0 transition-opacity duration-1000 ease-in-out bg-gradient-to-t from-slate-950 via-indigo-950 to-blue-900 ${backgroundColor === 'night' ? 'opacity-100' : 'opacity-0'}`}
       />
-      <p className={`absolute z-10 text-center w-full left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 ${!city && !isMenuOpen && isShowPrompt ? '' : 'hidden'}`}>Please allow location access to get the local weather information.</p>
+      {city
+        ? (
+          <section className={`relative duration-100 ease-in-out ${!isMenuOpen ? '' : 'hidden'}`} >
+            <CurrentWeather />
+            <Forecast />
+          </section>
+        )
+        : (
+          <p className={`absolute z-10 text-center w-full left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 ${!isMenuOpen && isShowPrompt ? '' : 'hidden'}`}>Please allow location access to get the local weather information.</p>
+        )
+      }
 
-      <section className={`relative duration-100 ease-in-out ${!isMenuOpen ? '' : 'hidden'}`} >
-        <CurrentWeather />
-        <Forecast />
-      </section>
+
+
     </>
   )
 }

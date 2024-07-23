@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import ForecastItem from './ForecastItem';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { getForecast } from '../store/slices/weather.slice';
+import { getLocalTime } from '../utils';
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -12,7 +13,6 @@ const Forecast: React.FC<ForecastProps> = () => {
   const dispatch = useAppDispatch();
 
   const city = useAppSelector(state => state.weather.city);
-  const currentWeather = useAppSelector(state => state.weather.currentWeather);
   const forecast = useAppSelector(state => state.weather.forecast);
 
   const { lat, lon } = city ?? {};
@@ -22,28 +22,34 @@ const Forecast: React.FC<ForecastProps> = () => {
     dispatch(getForecast({ lat, lon }));
   }, [dispatch, lat, lon])
 
-  if (!forecast || !currentWeather) return null;
+  if (!forecast) return null
 
-  const groupByDayList = forecast?.list?.reduce((acc, cur) => {
-    const day = new Date((cur.dt + currentWeather.timezone) * 1000).getUTCDay();
+  const timezone = forecast.city.timezone ?? 0;
 
-    if (!acc[day]) {
-      acc[day] = [cur];
-    } else {
-      acc[day].push(cur);
-    }
-    return acc;
-  }, {} as { [key: PropertyKey]: GetForecastResponse['list'] }) ?? [];
+  const groupByDayList = Object.entries(
+    forecast.list?.filter(item => new Date(item.dt_txt) >= new Date()).reduce((acc, cur) => {
+      const localTime = getLocalTime(cur.dt_txt, timezone);
+      const key = localTime.toLocaleDateString();
+
+      if (!acc[key]) {
+        acc[key] = [cur];
+      } else {
+        acc[key].push(cur);
+      }
+      return acc;
+    }, {} as { [key: PropertyKey]: GetForecastResponse['list'] }) ?? {});
+
+  console.log(groupByDayList);
 
   return (
     <section aria-label="5 day forecast" className='bg-blend-lighten p-3 rounded-2xl bg-gray-100 bg-opacity-10 backdrop-filter backdrop-blur-sm shadow-md'>
       <p aria-label='4 days forecast' className='font-medium pb-2 border-b-1'>Next 5-Day Forecast</p>
-      {Object.entries(groupByDayList).map(([dayNum, list], idx) => (
-        <div key={dayNum} className='flex items-center border-b-1 py-1 last:border-none'>
-          <p className='text-lg font-medium min-w-16'>{idx === 0 ? 'Today' : daysOfWeek[Number(dayNum)]}</p>
+      {groupByDayList.map(([key, list], idx) => (
+        <div key={key} className='flex items-center border-b-1 py-1 last:border-none'>
+          <p className='text-lg font-medium min-w-16'>{idx === 0 ? 'Today' : daysOfWeek[new Date(key).getDay()]}</p>
           <div className='flex overflow-x-scroll'>
-            {list.map((forecast) => (
-              <ForecastItem key={forecast.dt} forecast={forecast} />
+            {list.map((f) => (
+              <ForecastItem key={f.dt} forecast={f} city={forecast.city} />
             ))}
           </div>
         </div>

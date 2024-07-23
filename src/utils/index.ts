@@ -65,3 +65,38 @@ export function buildRequestUrl(
   url.search = searchParams.toString();
   return url.toString();
 }
+
+export function getLocalTime(
+  date: string | number | Date,
+  timezone: number
+): Date {
+  // 步驟 1: 將本地時間轉換為Date對象
+  const localDate = new Date(date);
+  // 步驟 2: 將本地時間轉換為UTC時間（毫秒）
+  const utcTime = localDate.getTime() + localDate.getTimezoneOffset() * 60000;
+  // 步驟 3: 根據該時區偏移計算該地區時間
+  const localTime = new Date(utcTime + timezone * 1000);
+
+  return localTime;
+}
+
+export function isDayOrNight(
+  sunrise: number,
+  sunset: number,
+  date: string | number | Date,
+  timezone: number
+) {
+  const localTime = getLocalTime(date, timezone);
+  const sunriseTime = getLocalTime(sunrise * 1000, timezone);
+  const sunsetTime = getLocalTime(sunset * 1000, timezone);
+  const hour = localTime.getHours();
+  const isNight = hour < sunriseTime.getHours() || hour > sunsetTime.getHours();
+  return isNight ? 'n' : 'd';
+}
+
+export function getIconSrc(icon: string, dayOrNight: 'd' | 'n') {
+  const iconNum = icon.substring(0, 2);
+  const key = `${iconNum}${dayOrNight}` as WeatherCondition['icon'];
+  const iconSrc = weatherIcon[key];
+  return iconSrc;
+}

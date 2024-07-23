@@ -1,21 +1,18 @@
 import React from 'react'
-import { weatherIcon } from '../utils';
-import { useAppSelector } from '../hooks';
+import { getIconSrc, getLocalTime, isDayOrNight } from '../utils';
 
 interface ForecastItemProps {
   forecast: GetForecastResponse['list'][0];
+  city: GetForecastResponse['city'];
 }
 
 const ForecastItem: React.FC<ForecastItemProps> = (props) => {
-  const { forecast } = props;
+  const { forecast, city } = props;
 
-  const currentWeather = useAppSelector(state => state.weather.currentWeather);
-
-  if (!currentWeather) return null;
-
-  const iconNum = forecast.weather[0].icon.substring(0, 2);
-  const hour = new Date((forecast.dt + currentWeather.timezone) * 1000).getUTCHours() + 1;
-  const iconSrc = weatherIcon[`${iconNum}${[21, 24, 3].includes(hour) ? 'n' : 'd'}` as WeatherCondition['icon']];
+  const { sunrise, sunset } = city;
+  const hour = getLocalTime(forecast.dt_txt, city.timezone).getHours();
+  const dayOrNight = isDayOrNight(sunrise, sunset, forecast.dt_txt, city.timezone);
+  const iconSrc = getIconSrc(forecast.weather[0].icon, dayOrNight);
 
   return (
     <div className='text-center'>
