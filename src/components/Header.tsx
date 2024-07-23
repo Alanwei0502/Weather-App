@@ -36,7 +36,7 @@ const Header = () => {
   }
 
   return (
-    <header className={`backdrop-blur-3xl px-2 py-4 sticky top-0 z-10 bg-black ${isMenuOpen ? 'block' : 'hidden'}`}>
+    <header className={`px-2 py-4 sticky top-0 z-10 bg-black ${isMenuOpen ? '' : 'hidden'}`}>
       <Input value={input} icon='search' onChange={handleChange} onKeyDown={handleSearch} placeholder="Search for a city" />
     </header>
   )

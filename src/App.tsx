@@ -8,7 +8,7 @@ function App() {
   return (
     <div className='mx-auto max-w-screen-md'>
       <Header />
-      <main className='text-shadow-sm px-2 pb-20 mx-auto max-w-screen-md min-h-screen relative select-none overflow-y-scroll'>
+      <main className='text-shadow-sm px-2 pb-20 mx-auto min-h-screen relative select-none overflow-y-scroll'>
         <WeatherDashboard />
         <CityCardList />
       </main>
